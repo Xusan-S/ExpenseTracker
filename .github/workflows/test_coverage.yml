@@ -1,0 +1,44 @@
+name: Go Tests & Coverage
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  GOPRIVATE: github.com/alif-academy-uz
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+
+      - name: Clean mod cache
+        run: go clean -modcache
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run tests with coverage
+        run: go test $(go list ./... | grep -v '/cmd/') -coverprofile=coverage.out -covermode=atomic
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          echo "Total coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+            echo "Coverage is below 70%! Failing the job."
+            exit 1
+          fi
