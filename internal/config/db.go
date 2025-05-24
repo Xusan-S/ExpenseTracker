@@ -1,4 +1,4 @@
-package config 
+package config
 
 import (
 	"context"
@@ -10,8 +10,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// test comment
+
 func ConnectDB() *pgxpool.Pool {
-dbURL := fmt.Sprintf(
+	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
